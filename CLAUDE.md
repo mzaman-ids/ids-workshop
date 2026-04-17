@@ -1,6 +1,6 @@
 # IDS AI Skeleton — Claude Code Instructions
 
-> This file is auto-loaded every conversation. Keep it lean — detailed standards live in `docs/standards/`.
+> This file is auto-loaded every conversation. Keep it lean — detailed standards live in `docs/`.
 
 ---
 
@@ -10,12 +10,10 @@ Load these before writing any code. Read standards **before** reading project so
 
 | File | When |
 |---|---|
-| `docs/standards/coding-standards-core.md` | **Always** when writing code |
-| `docs/standards/coding-standards-backend.md` | Backend work (`apps/astra-apis/**`) |
-| `docs/standards/coding-standards-frontend.md` | Frontend work (`apps/client-web/**`) |
-| `docs/standards/ravendb-document-design.md` | RavenDB entities, indexes, queries, or document schema changes |
-| `docs/architecture/web-client-architecture.md` | Frontend work — feature modules, forms, routing, auth flow |
-| `.ai-workflow/.ai-project-architecture.md` | Adding features or unfamiliar with structure |
+| `docs/CODING_STANDARD.md` | **Always** when writing code |
+| `docs/DESIGN_STANDARD.md` | Frontend work (`apps/client-web/**`) — MUI, forms, search, grid |
+| `docs/ARCHITECTURE.md` | Adding features, routing, auth flow, or unfamiliar with structure |
+| `docs/TECHNOLOGY_OVERVIEW.md` | Understanding the tech stack, business context, or multi-tenancy model |
 | `.ai-workflow/.agent.md` | Planning, complex tasks |
 
 ---
@@ -75,23 +73,18 @@ This is critical. **These are clarifications — do NOT implement:**
 All commits must follow this format (enforced by commitlint):
 
 ```
-<type>(<JIRA-ID>): <subject>
+<type>: <subject>
 ```
 
 **Allowed types:** `chore` `doc` `feat` `fix` `minor` `refact` `tool` `ux`
-
-**JIRA-ID rules:**
-- Must be `UPPERCASE-NUMBER` — e.g., `IDSMOD-54`, `IDS-123`
-- Project code: uppercase letters only — `IDSMOD` ✅, `idsmod` ❌
-- Followed by hyphen + digits — `IDSMOD-54` ✅, `IDSMOD` ❌
 
 **Subject rules:**
 - Start with lowercase — `add feature` ✅, `Add feature` ❌
 - 10–99 characters
 - Present tense ("add" not "added")
-- Space after colon — `feat(IDSMOD-54): add...` ✅
+- Space after colon — `feat: add...` ✅
 
-When committing: always propose 2 options (concise, standard). Extract JIRA ticket from branch name first. Wait for user selection before committing.
+When committing: always propose 2 options (concise, standard). Wait for user selection before committing.
 
 ---
 
@@ -103,11 +96,11 @@ When committing: always propose 2 options (concise, standard). Extract JIRA tick
 - **Multi-tenancy**: A tenant = a `Location`. Data is scoped by `locationId` on every entity. Queries **must always filter by `locationId`** unless the entity is explicitly global/system-level.
 - **Database**: RavenDB for application data (`ids_db`). PostgreSQL for Logto auth (`logto_db`). Both in `docker-compose.yml`.
 - **Auth**: Logto (OAuth 2.0 / OIDC). Backend validates JWT via `@logto/node`. Guards check permissions; location context flows from auth into queries.
-- **SSR**: React Router configured `ssr: true`. Use `loader` for server-side data fetching, `clientLoader` for browser-only.
+- **SSR**: React Router configured `ssr: false`. Use `clientLoader` (not `loader`) for data fetching in protected routes.
 - **Shared library**: `@ids/data-models` (`libs/shared/data-models/`) — single intentional barrel export. Always import from `@ids/data-models`.
-- **Navigation**: Always list `apps/astra-apis/src/app/` and `apps/client-web/app/` to discover module structure before making changes.
+- **Navigation**: Always list `apps/astra-apis/src/` and `apps/client-web/app/` to discover module structure before making changes.
 
-See `.ai-workflow/.ai-project-architecture.md` for full folder layout, DTO architecture, and naming conventions.
+See `docs/ARCHITECTURE.md` for full folder layout, auth flow, and data flow conventions.
 
 ---
 
