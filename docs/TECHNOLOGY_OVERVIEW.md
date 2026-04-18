@@ -74,17 +74,27 @@ The UI term is always "Location". "Logto Organization" is an implementation deta
 
 ---
 
+## Service URLs (Local Development)
+
+| Service | URL | Notes |
+|---|---|---|
+| React Web UI | http://localhost:3004 | `npm run dev:web` |
+| NestJS API | http://localhost:3000 | `npm run dev:apis` |
+| NestJS Swagger / OpenAPI | http://localhost:3000/api/docs | Interactive API explorer |
+| Logto App (auth server) | http://localhost:3001 | OIDC endpoints |
+| Logto Admin Console | http://localhost:3002 | Manage users, orgs, roles |
+| RavenDB Studio | http://localhost:3333 | Database explorer |
+| Mailpit (dev email) | http://localhost:8025 | Catches all outbound email |
+
 ## Local Infrastructure (Docker)
 
-`docker-compose.yml` runs three services:
+`docker-compose.yml` runs three services. Start with: `docker-compose up -d`
 
-| Service | Port | Purpose |
-|---|---|---|
-| RavenDB | 8080 (HTTP), 38888 (TCP) | Application database (`ids_db`) |
-| Logto | 3001 (app), 3002 (admin) | Auth server + admin console |
-| Mailpit | 1025 (SMTP), 8025 (web UI) | Dev email catch-all |
-
-Start with: `docker-compose up -d`
+| Service | Container Port | Host Port | Purpose |
+|---|---|---|---|
+| RavenDB | 3333 | 3333 | Application database (`ids_db`) |
+| Logto | 3001, 3002 | 3001, 3002 | Auth server + admin console |
+| Mailpit | 8025 (web), 1025 (SMTP) | 8025, 1025 | Dev email catch-all |
 
 ---
 
