@@ -2,7 +2,7 @@ services:
   logto_svc:
     image: svhd/logto:1.36.0
     platform: linux/amd64
-    container_name: logto_svc
+    container_name: logto_svc_aiws
     depends_on:
       postgres:
         condition: service_healthy # Wait for Postgres healthcheck before starting
@@ -18,7 +18,7 @@ services:
 
   postgres:
     image: postgres:18.3-alpine # Postgres used by Logto only
-    container_name: postgres
+    container_name: postgres_aiws
     user: postgres
     environment:
       POSTGRES_USER: ${LOGTO_DB_USER}
@@ -30,7 +30,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "${LOGTO_DB_PORT}:5432" # Expose PostgreSQL on host
+      - "${LOGTO_DB_HOST_PORT}:5432" # Expose PostgreSQL on host (5433 avoids conflict with other local Postgres instances)
     volumes:
       - pgdata:/var/lib/postgresql/data # Persistent volume for Logto database
     restart: unless-stopped
@@ -38,7 +38,7 @@ services:
   ravendb:
     image: ravendb/ravendb:7.2-ubuntu-latest
     platform: linux/amd64
-    container_name: ravendb
+    container_name: ravendb_aiws
     environment:
       - RAVEN_Setup_Mode=None
       - RAVEN_Security_UnsecuredAccessAllowed=PublicNetwork # Dev-only HTTP; localhost-only exposure is enforced by port binding below
@@ -52,7 +52,7 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest # Mailpit - Email testing for developers
-    container_name: mailpit
+    container_name: mailpit_aiws
     ports:
       - "8025:8025" # Web UI for viewing emails
       - "1025:1025" # SMTP server (for sending emails)
