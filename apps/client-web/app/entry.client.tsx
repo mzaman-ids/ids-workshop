@@ -5,7 +5,7 @@
  */
 
 import {StrictMode, startTransition} from 'react';
-import {hydrateRoot} from 'react-dom/client';
+import {createRoot, hydrateRoot} from 'react-dom/client';
 import {HydratedRouter} from 'react-router/dom';
 import {createRouterContext} from './core/middleware/routerContext';
 import i18n from './i18n';
@@ -13,6 +13,18 @@ import i18n from './i18n';
 // Prevent tree-shaking of i18n initialization
 if (!i18n.isInitialized && !i18n.isInitializing) {
   console.warn('i18n not initialized for client hydration');
+}
+
+if (import.meta.env['VITE_ENABLE_IDS_DOCTOR'] === 'true') {
+  void import('./components/doctor/doctor-sdk').then(({initialize}) => initialize());
+
+  const doctorRoot = document.createElement('div');
+  doctorRoot.id = 'ids-doctor-root';
+  document.body.appendChild(doctorRoot);
+
+  void import('./components/doctor/DoctorPanel').then(({DoctorPanel}) => {
+    createRoot(doctorRoot).render(<DoctorPanel />);
+  });
 }
 
 startTransition(() => {
