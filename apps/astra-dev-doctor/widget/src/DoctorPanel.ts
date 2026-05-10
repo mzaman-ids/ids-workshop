@@ -111,7 +111,7 @@ export function createPanel(shadow: ShadowRoot): void {
     const network = getNetworkEvents();
     const cons = getConsoleEvents();
     const issues =
-      network.filter((e) => e.status === 0 || e.status >= 400).length +
+      network.filter((e) => (e.status === 0 && !e.aborted) || e.status >= 400).length +
       cons.filter((e) => e.level === 'error' || e.level === 'rejection').length;
 
     const fab = `<button class="fab${issues > 0 ? ' warn' : ''}" data-action="toggle">🩺${issues > 0 ? `<span class="badge">${issues}</span>` : ''}</button>`;
@@ -138,7 +138,7 @@ export function createPanel(shadow: ShadowRoot): void {
             <button data-action="sync"${busy ? ' disabled' : ''}>⬆ Sync</button>
             <button data-action="capture-dom"${busy ? ' disabled' : ''}>📷 DOM</button>
             <button data-action="clear">🗑 Clear</button>
-            <button class="btn-icon" data-action="reset-pos" title="Reset position">⤡</button>
+            <button class="btn-icon" data-action="reset-pos" title="Reset position">↺</button>
             <button class="btn-icon" data-action="close" title="Close">✕</button>
           </div>
         </header>
@@ -158,7 +158,7 @@ export function createPanel(shadow: ShadowRoot): void {
   function renderNetwork(network: NetworkEvent[]): string {
     const evs =
       networkFilter === 'fails'
-        ? network.filter((e) => e.status === 0 || e.status >= 400)
+        ? network.filter((e) => (e.status === 0 && !e.aborted) || e.status >= 400)
         : network;
     if (evs.length === 0) {
       return '<div class="empty">No API calls captured yet.</div>';
@@ -168,7 +168,7 @@ export function createPanel(shadow: ShadowRoot): void {
       .reverse()
       .map(
         (e) =>
-          `<div class="row"><div class="meta"><span class="pill">${esc(e.method)}</span><span class="${statusCls(e.status)}">${esc(e.status)}</span><span class="url">${esc(e.url)}</span><span class="muted">${esc(e.durationMs)}ms</span></div></div>`,
+          `<div class="row"><div class="meta"><span class="pill">${esc(e.method)}</span><span class="${e.aborted ? 'muted' : statusCls(e.status)}">${e.aborted ? 'aborted' : esc(e.status)}</span><span class="url">${esc(e.url)}</span><span class="muted">${esc(e.durationMs)}ms</span></div></div>`,
       )
       .join('');
   }

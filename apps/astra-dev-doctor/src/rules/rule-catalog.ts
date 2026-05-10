@@ -1,6 +1,19 @@
 import type {DoctorEvidence, DoctorFinding, DoctorRule} from './doctor-rule';
 import {makeFinding} from './doctor-rule';
 
+function decodeJwtPayload(authHeader: string): Record<string, unknown> {
+  try {
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return {};
+    }
+    return JSON.parse(Buffer.from(parts[1], 'base64url').toString()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
 const tokenRetryRace: DoctorRule = {
   id: 'token_retry_race',
   severity: 'high',
@@ -273,15 +286,121 @@ const slowEndpoint: DoctorRule = {
   },
 };
 
+const staleToken: DoctorRule = {
+  id: 'stale_token',
+  severity: 'medium',
+  detect(ev: DoctorEvidence): DoctorFinding[] {
+    const writes = ev.networkEvents.filter(
+      (e) =>
+        (e.method === 'POST' || e.method === 'PUT' || e.method === 'PATCH') &&
+        e.status >= 200 &&
+        e.status < 300,
+    );
+
+    const byIat = new Map<number, typeof writes>();
+    for (const e of writes) {
+      const auth = e.requestHeaders['Authorization'] ?? e.requestHeaders['authorization'] ?? '';
+      if (!auth) {
+        continue;
+      }
+      const payload = decodeJwtPayload(auth);
+      const iat = typeof payload['iat'] === 'number' ? payload['iat'] : null;
+      if (iat === null) {
+        continue;
+      }
+      const group = byIat.get(iat) ?? [];
+      group.push(e);
+      byIat.set(iat, group);
+    }
+
+    for (const [iat, events] of byIat) {
+      if (events.length < 2) {
+        continue;
+      }
+      const spanMs = events[events.length - 1].ts - events[0].ts;
+      if (spanMs > 10 * 60 * 1000) {
+        const spanMin = Math.round(spanMs / 60_000);
+        return [
+          makeFinding(
+            'stale_token',
+            'medium',
+            `Stale token — same JWT reused for writes over ${spanMin}m`,
+            `${events.length} successful write requests used a token issued at ${new Date(iat * 1000).toLocaleString()} over ${spanMin} minutes. The token may not have been refreshed — locationId or user context in the token could be stale.`,
+            ev,
+            {
+              nextChecks: [
+                'Check if the token refresh mechanism fires before long-running flows.',
+                'Verify LocationProvider refreshes the location token between writes.',
+              ],
+              likelyFiles: ['apps/client-web/app/core/contexts/auth/AuthProvider.tsx'],
+            },
+          ),
+        ];
+      }
+    }
+    return [];
+  },
+};
+
+const runtimeContextLocationDrift: DoctorRule = {
+  id: 'runtime_context_location_drift',
+  severity: 'high',
+  detect(ev: DoctorEvidence): DoctorFinding[] {
+    const runtimeLocId = (ev.runtimeContext['location'] as {locationId?: string} | undefined)
+      ?.locationId;
+    if (!runtimeLocId) {
+      return [];
+    }
+
+    const writes = ev.networkEvents.filter(
+      (e) =>
+        (e.method === 'POST' || e.method === 'PUT' || e.method === 'PATCH') &&
+        e.status >= 200 &&
+        e.status < 300,
+    );
+
+    const drifted = writes.filter((e) => {
+      const bodyLocId = (e.reqBody as Record<string, unknown> | null)?.['locationId'];
+      return typeof bodyLocId === 'string' && bodyLocId !== '' && bodyLocId !== runtimeLocId;
+    });
+
+    if (drifted.length === 0) {
+      return [];
+    }
+
+    const first = drifted[0];
+    const bodyLocId = (first.reqBody as Record<string, unknown>)?.['locationId'];
+    return [
+      makeFinding(
+        'runtime_context_location_drift',
+        'high',
+        'Location context drift — write body locationId differs from runtime context',
+        `The runtime context reports locationId "${runtimeLocId}" but ${drifted.length} write request(s) used "${String(bodyLocId)}". The mutation likely captured locationId at mount time and missed a subsequent location switch.`,
+        ev,
+        {
+          url: first.url,
+          nextChecks: [
+            'Check if the form or mutation reads locationId from context at submit time, not at mount time.',
+            'Verify LocationProvider has settled before the write is dispatched.',
+          ],
+          likelyFiles: ['apps/client-web/app/core/contexts/location/LocationProvider.tsx'],
+        },
+      ),
+    ];
+  },
+};
+
 export const ruleCatalog: DoctorRule[] = [
   tokenRetryRace,
   silentLocationScopeLoss,
+  runtimeContextLocationDrift,
   authLoop,
   apiUnreachable,
   unhandledNotFound,
   unhandledValidationError,
   repeatedConsoleErrors,
   unhandledRejectionSpike,
+  staleToken,
   slowEndpoint,
 ];
 

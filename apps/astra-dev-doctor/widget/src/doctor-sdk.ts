@@ -189,6 +189,24 @@ function tryWindowRuntime(): Record<string, unknown> {
   };
 }
 
+function extractLocationIdFromUrl(url: string): string {
+  try {
+    return new URL(url, window.location.origin).searchParams.get('locationId') ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function seedRuntimeContextFromUrl(url: string): void {
+  if ((_latestRuntimeContext['location'] as {locationId?: string} | undefined)?.locationId) {
+    return;
+  }
+  const locationId = extractLocationIdFromUrl(url);
+  if (locationId) {
+    _latestRuntimeContext['location'] = {locationId};
+  }
+}
+
 export async function syncToSidecar(force = false, opts: SyncOpts = {}): Promise<Finding[]> {
   const {includeDomSnapshot = false, networkFilter = 'all'} = opts;
   if (_syncPending && !force) {
@@ -203,8 +221,9 @@ export async function syncToSidecar(force = false, opts: SyncOpts = {}): Promise
       networkFilter === 'fails'
         ? allEvents.filter((e) => e.status === 0 || e.status >= 400)
         : allEvents;
-    const runtimeContext =
+    const rawContext =
       Object.keys(_latestRuntimeContext).length > 0 ? _latestRuntimeContext : tryWindowRuntime();
+    const runtimeContext = Object.keys(rawContext).length > 0 ? rawContext : undefined;
     const res = await fetch(`${_sidecarUrl}/telemetry/events`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -254,8 +273,9 @@ export function initialize(sidecarUrl: string): void {
     const url = String(input instanceof Request ? input.url : input);
     const isSidecar = url.startsWith(_sidecarUrl);
     const isRelativeApi = url.startsWith('/api');
-    // Intercept only app API calls (not sidecar calls)
-    if (isSidecar || (!url.includes('/api') && !isRelativeApi)) {
+    const method = (init?.method ?? 'GET').toUpperCase();
+    // Skip sidecar calls, non-API calls, and CORS preflight requests
+    if (isSidecar || (!url.includes('/api') && !isRelativeApi) || method === 'OPTIONS') {
       return origFetch(input, init);
     }
 
@@ -264,19 +284,22 @@ export function initialize(sidecarUrl: string): void {
     try {
       res = await origFetch(input, init);
     } catch (error) {
+      const isAbort =
+        (error as {name?: string})?.name === 'AbortError' || init?.signal?.aborted === true;
       const ctx = getUserContext();
       _network.push({
         id: nextId('net'),
         sessionId: _sessionId,
         ts: start,
         tsHuman: toHuman(start),
-        method: (init?.method ?? 'GET').toUpperCase(),
+        method,
         url,
         status: 0,
         requestHeaders: {},
         reqBody: null,
-        resBody: error instanceof Error ? error.message : 'Network error',
+        resBody: isAbort ? 'Aborted' : ((error as {message?: string})?.message ?? 'Network error'),
         durationMs: Date.now() - start,
+        aborted: isAbort || undefined,
         userId: ctx.userId,
         locationId: ctx.locationId,
         locationName: ctx.locationName,
@@ -306,6 +329,8 @@ export function initialize(sidecarUrl: string): void {
             ? Object.fromEntries(headers.entries())
             : (headers as Record<string, string>);
 
+        seedRuntimeContextFromUrl(url);
+
         const authHeader = headersRecord['Authorization'] ?? headersRecord['authorization'] ?? '';
         const userId = authHeader.startsWith('Bearer ')
           ? decodeJwtSub(authHeader.slice(7))
@@ -317,7 +342,7 @@ export function initialize(sidecarUrl: string): void {
           sessionId: _sessionId,
           ts: start,
           tsHuman: toHuman(start),
-          method: (init?.method ?? 'GET').toUpperCase(),
+          method,
           url,
           status: res.status,
           requestHeaders: headersRecord,
@@ -354,6 +379,20 @@ export function initialize(sidecarUrl: string): void {
     notifyTelemetryChanged();
   };
 
+  const origWarn = console.warn.bind(console);
+  console.warn = (...args: unknown[]) => {
+    origWarn(...args);
+    _console.push({
+      id: nextId('con'),
+      sessionId: _sessionId,
+      ts: Date.now(),
+      tsHuman: toHuman(Date.now()),
+      level: 'warn',
+      message: args.map(String).join(' ').slice(0, 500),
+    });
+    notifyTelemetryChanged();
+  };
+
   window.addEventListener('unhandledrejection', (e: PromiseRejectionEvent) => {
     _console.push({
       id: nextId('rej'),
@@ -368,21 +407,4 @@ export function initialize(sidecarUrl: string): void {
   });
 
   window.__doctorSync = () => syncToSidecar(true).then(() => undefined);
-
-  // Push a fresh snapshot on every navigation
-  const pushSnapshot = () => {
-    const snap = captureSnapshot();
-    void fetch(`${_sidecarUrl}/snapshot`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(snap),
-    }).catch(() => undefined);
-  };
-
-  window.addEventListener('popstate', pushSnapshot);
-  const origPush = history.pushState.bind(history);
-  history.pushState = (...args: Parameters<typeof history.pushState>) => {
-    origPush(...args);
-    setTimeout(pushSnapshot, 300);
-  };
 }

@@ -85,7 +85,7 @@ export class ReportService {
     lines.push(
       '',
       '## Raw Evidence Files',
-      '- `.doctor/snapshot.json` — latest browser state',
+      '- `.doctor/page-context.json` — latest page state: URL, user/location context, visible text, error elements',
       '- `.doctor/latest-runtime-context.json` — optional app-shell bridge context from TanStack Query/auth/location/theme/network',
       '- `.doctor/latest-dom-snapshot.md` / `.json` — optional measured DOM/layout snapshot when captured',
       '- `.doctor/sessions/latest-network.jsonl` — raw network events, including headers/JWTs for local replay',

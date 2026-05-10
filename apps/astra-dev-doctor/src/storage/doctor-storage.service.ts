@@ -59,7 +59,7 @@ export class DoctorStorageService {
   public writeSnapshot(snapshot: SnapshotDto): void {
     ensureDirs();
     fs.writeFileSync(
-      path.join(doctorDir, 'snapshot.json'),
+      path.join(doctorDir, 'page-context.json'),
       JSON.stringify(snapshot, null, 2),
       'utf8',
     );
@@ -75,6 +75,9 @@ export class DoctorStorageService {
   }
 
   public writeFindings(findings: DoctorFinding[]): void {
+    if (findings.length === 0) {
+      return;
+    }
     ensureDirs();
     fs.writeFileSync(
       path.join(doctorDir, 'findings.json'),

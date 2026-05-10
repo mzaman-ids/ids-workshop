@@ -13,6 +13,7 @@ export type NetworkEvent = {
   userId: string;
   locationId: string;
   locationName: string;
+  aborted?: boolean;
 };
 
 export type ConsoleEvent = {

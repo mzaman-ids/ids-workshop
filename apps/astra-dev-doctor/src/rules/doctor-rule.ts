@@ -9,6 +9,7 @@ export type DoctorEvidence = {
   networkEvents: NetworkEventDto[];
   consoleEvents: ConsoleEventDto[];
   snapshot: SnapshotDto;
+  runtimeContext: Record<string, unknown>;
 };
 
 export type DoctorFinding = {

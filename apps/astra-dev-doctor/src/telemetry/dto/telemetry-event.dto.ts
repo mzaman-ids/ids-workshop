@@ -16,6 +16,7 @@ export class NetworkEventDto {
   @IsString() public userId!: string;
   @IsString() public locationId!: string;
   @IsString() public locationName!: string;
+  @IsOptional() public aborted?: boolean;
 }
 
 export class ConsoleEventDto {

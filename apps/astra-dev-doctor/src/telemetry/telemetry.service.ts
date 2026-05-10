@@ -12,6 +12,7 @@ export class TelemetryService {
   private readonly _networkRing: NetworkEventDto[] = [];
   private _latestFindings: DoctorFinding[] = [];
   private _latestSnapshot: TelemetryBatchDto['snapshot'] | null = null;
+  private _latestRuntimeContext: Record<string, unknown> = {};
 
   constructor(
     private readonly _storage: DoctorStorageService,
@@ -31,7 +32,8 @@ export class TelemetryService {
     // Persist raw data
     this._storage.writeSessionFiles(batch.sessionId, batch.networkEvents, batch.consoleEvents);
     this._storage.writeSnapshot(batch.snapshot);
-    if (batch.runtimeContext) {
+    if (batch.runtimeContext && Object.keys(batch.runtimeContext).length > 0) {
+      this._latestRuntimeContext = batch.runtimeContext;
       this._storage.writeRuntimeContext(batch.runtimeContext);
     }
     if (batch.domSnapshot) {
@@ -44,6 +46,7 @@ export class TelemetryService {
       networkEvents: this._networkRing,
       consoleEvents: batch.consoleEvents,
       snapshot: batch.snapshot,
+      runtimeContext: this._latestRuntimeContext,
     };
     const findings = runRules(evidence);
     this._latestFindings = findings;
