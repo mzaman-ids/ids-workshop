@@ -13,6 +13,9 @@
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
   "nxCloudEnforcement": "never",
+  "workspaceLayout": {
+    "ignore": [".worktrees"]
+  },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
