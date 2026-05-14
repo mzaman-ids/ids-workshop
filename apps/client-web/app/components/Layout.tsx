@@ -289,7 +289,7 @@ export function Layout() {
           label: t('navigation:stockAdjustments'),
           icon: <ShelvesIcon color="inherit" />,
           featureId: 'stock-adjustments',
-          route: null,
+          route: '/stock-adjustments',
         },
       ],
     },

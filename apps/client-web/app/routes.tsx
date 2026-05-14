@@ -27,6 +27,10 @@ export default [
       route('vendors/create', './pages/vendors/VendorCreate.tsx'),
       route('vendors/:id', './pages/vendors/VendorDetail.tsx'),
 
+      // Stock Adjustments
+      route('stock-adjustments', './pages/stock-adjustments/StockAdjustmentList.tsx'),
+      route('stock-adjustments/create', './pages/stock-adjustments/StockAdjustmentCreate.tsx'),
+
       // User profile
       route('user-settings', './pages/UserSettings.tsx'),
 
