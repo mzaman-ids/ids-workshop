@@ -47,7 +47,7 @@ export default function VendorCreate() {
   const navigation: Navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
 
-  const [formDirty, setFormDirty] = useState(false);
+  const [_formDirty, setFormDirty] = useState(false);
   const handleDirtyChange = useCallback((dirty: boolean) => setFormDirty(dirty), []);
 
   if (actionData?.success) {
