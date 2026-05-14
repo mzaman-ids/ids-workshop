@@ -1,6 +1,7 @@
 import {BadRequestException, NotFoundException} from '@nestjs/common';
 import {Test, type TestingModule} from '@nestjs/testing';
 import {vi} from 'vitest';
+import {RavenDocumentStoreProvider} from '../infrastructure/ravendb/document-store.provider';
 import {RavenSessionFactory} from '../infrastructure/ravendb/session-factory';
 import type {Part, PartLocation} from '../part/entities/part.entity';
 import {PartStatus} from '../part/entities/part.entity';
@@ -76,7 +77,11 @@ describe('StockAdjustmentsService', () => {
   async function build(part: Part | null, existingAdjCount = 0) {
     const {factory} = makeSessionFactory(part, existingAdjCount);
     const module: TestingModule = await Test.createTestingModule({
-      providers: [StockAdjustmentsService, {provide: RavenSessionFactory, useValue: factory}],
+      providers: [
+        StockAdjustmentsService,
+        {provide: RavenSessionFactory, useValue: factory},
+        {provide: RavenDocumentStoreProvider, useValue: {getStore: vi.fn()}},
+      ],
     }).compile();
     service = module.get(StockAdjustmentsService);
     return factory;

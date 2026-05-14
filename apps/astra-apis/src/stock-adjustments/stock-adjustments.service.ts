@@ -4,17 +4,36 @@ import type {
   DbStockAdjustmentListItem,
 } from '@ids/data-models';
 import {DEFAULT_PAGE_SIZE, type PagedResponseDto, toPagedDto} from '@ids/data-models';
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import type {OnModuleInit} from '@nestjs/common';
+import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {createIdsBaseEntity} from '../common/entities/ids-base.entity';
+import {RavenDocumentStoreProvider} from '../infrastructure/ravendb/document-store.provider';
 import {RavenSessionFactory} from '../infrastructure/ravendb/session-factory';
 import type {Part, PartLocation} from '../part/entities/part.entity';
 import type {AdjustmentCreateDto} from './dto/adjustment-create.dto';
 import type {AdjustmentListQueryDto} from './dto/adjustment-list.query.dto';
 import {StockAdjustment} from './entities/stock-adjustment.entity';
+import {StockAdjustments_ByLocation} from './indexes/stock-adjustments-by-location.index';
 
 @Injectable()
-export class StockAdjustmentsService {
-  public constructor(private readonly _sessionFactory: RavenSessionFactory) {}
+export class StockAdjustmentsService implements OnModuleInit {
+  private readonly _logger = new Logger(StockAdjustmentsService.name);
+
+  public constructor(
+    private readonly _sessionFactory: RavenSessionFactory,
+    private readonly _storeProvider: RavenDocumentStoreProvider,
+  ) {}
+
+  public async onModuleInit(): Promise<void> {
+    try {
+      await new StockAdjustments_ByLocation().execute(this._storeProvider.getStore());
+    } catch (error) {
+      this._logger.warn(
+        'Failed to create StockAdjustments/ByLocation index',
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
 
   public async create(
     dto: AdjustmentCreateDto,
