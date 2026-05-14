@@ -8,6 +8,7 @@ import {partSeedData} from './seeds/data/part.data.js';
 import {partStatusCodeSeedData} from './seeds/data/part-status-code.data.js';
 import {saleCategorySeedData} from './seeds/data/sale-category.data.js';
 import {shipWeightCodeSeedData} from './seeds/data/ship-weight-code.data.js';
+import {stockAdjustmentSeedData} from './seeds/data/stock-adjustment.data.js';
 import {taxCodeSeedData} from './seeds/data/tax-code.data.js';
 import {unitOfMeasurementSeedData} from './seeds/data/uom.data.js';
 import {userSeedData} from './seeds/data/user.data.js';
@@ -86,6 +87,7 @@ store.initialize();
  *   12. Part-Locations       (depends on Parts seed data, Bins, Locations)
  *   13. Part-Vendors         (depends on Parts seed data, Vendors)
  *   14. Parts                (depends on Vendors, Locations, Bins, UOMs — validates all references)
+ *   15. Stock Adjustments   (depends on Parts — references part numbers)
  */
 async function seed(): Promise<void> {
   const session = store.openSession();
@@ -505,6 +507,33 @@ async function seed(): Promise<void> {
       }
     }
 
+    // ── 15. Stock Adjustments ────────────────────────────────────────────────
+    for (const adj of stockAdjustmentSeedData) {
+      const docId = `stock-adjustments/${adj.adjustmentNumber}`;
+      await session.store(
+        {
+          id: docId,
+          adjustmentNumber: adj.adjustmentNumber,
+          locationId: adj.locationId,
+          partNumber: adj.partNumber,
+          partDescriptionSnapshot: adj.partDescriptionSnapshot,
+          type: adj.type,
+          quantity: adj.quantity,
+          quantityDelta: adj.quantityDelta,
+          reasonCode: adj.reasonCode,
+          notes: adj.notes ?? null,
+          createdDate: now,
+          updatedDate: now,
+          createdBy: 'system',
+          updatedBy: 'system',
+          version: 1,
+          isDeleted: false,
+        },
+        docId,
+      );
+    }
+    await session.saveChanges();
+
     console.log(
       `Seed complete: ${unitOfMeasurementSeedData.length} uoms, ` +
         `${glGroupSeedData.length} gl-groups, ${taxCodeSeedData.length} tax-codes, ` +
@@ -514,7 +543,7 @@ async function seed(): Promise<void> {
         `${locationSeedData.length} locations, ${vendorSeedData.length} vendors, ${binSeedData.length} bins, ` +
         `${userSeedData.length} users, ` +
         `${partLocationSeedData.length} part-locations, ${partVendorSeedData.length} part-vendors, ` +
-        `${partSeedData.length} parts.`,
+        `${partSeedData.length} parts, ${stockAdjustmentSeedData.length} stock-adjustments.`,
     );
   } catch (err) {
     console.error('Seed failed:', err);
