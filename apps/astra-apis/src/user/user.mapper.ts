@@ -19,6 +19,9 @@ export function toUserDto(user: IUser): UserResponseDto {
     profileCompleteness: user.profileCompleteness,
     lastLoginAt: user.lastLoginAt ?? null,
     hasProfilePhoto: user.hasProfilePhoto ?? false,
+    isDeleted: user.isDeleted ?? false,
+    createdDate: user.createdDate,
+    updatedDate: user.updatedDate,
   };
 }
 

@@ -45,4 +45,13 @@ export class UserResponseDto {
 
   @ApiProperty()
   hasProfilePhoto!: boolean;
+
+  @ApiProperty()
+  isDeleted!: boolean;
+
+  @ApiProperty({required: false, nullable: true})
+  createdDate!: Date;
+
+  @ApiProperty({required: false, nullable: true})
+  updatedDate!: Date;
 }
