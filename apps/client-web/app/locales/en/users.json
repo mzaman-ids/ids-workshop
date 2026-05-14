@@ -41,5 +41,17 @@
     "smsNotifications": "SMS Notifications",
     "marketingEmails": "Marketing Emails"
   },
-  "never": "Never"
+  "never": "Never",
+  "deactivate": {
+    "confirmTitle": "Deactivate User",
+    "confirmMessage": "Are you sure you want to deactivate {{name}}? They will no longer be able to access the application.",
+    "cancel": "Cancel",
+    "confirm": "Deactivate"
+  },
+  "reactivate": {
+    "confirmTitle": "Reactivate User",
+    "confirmMessage": "Are you sure you want to reactivate {{name}}? They will be able to access the application again.",
+    "cancel": "Cancel",
+    "confirm": "Reactivate"
+  }
 }

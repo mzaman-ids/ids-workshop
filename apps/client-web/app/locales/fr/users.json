@@ -1,1 +1,57 @@
-{}
+{
+  "title": "Utilisateurs",
+  "search": "Rechercher des utilisateurs...",
+  "noResults": "Aucun utilisateur trouvé",
+  "usersFound": "utilisateurs trouvés",
+  "userNotFound": "Utilisateur non trouvé",
+  "backToUsers": "Retour aux utilisateurs",
+  "saving": "Enregistrement...",
+  "cancel": "Annuler",
+  "updateSuccess": "Profil utilisateur mis à jour avec succès.",
+  "unsavedChanges": {
+    "editMessage": "Les modifications apportées à ce profil utilisateur seront perdues. Êtes-vous sûr de vouloir annuler?"
+  },
+  "pageTitle": {
+    "edit": "Modifier le profil utilisateur",
+    "save": "Enregistrer les modifications"
+  },
+  "userList": {
+    "displayName": "Nom",
+    "email": "Email",
+    "username": "Nom d'utilisateur",
+    "lastLogin": "Dernière connexion",
+    "profileCompleteness": "Profil"
+  },
+  "fields": {
+    "logtoUserId": "ID utilisateur Logto",
+    "email": "Email",
+    "username": "Nom d'utilisateur",
+    "displayName": "Nom d'affichage",
+    "nickname": "Surnom",
+    "bio": "Bio",
+    "timezone": "Fuseau horaire",
+    "preferredLanguage": "Langue préférée",
+    "lastLoginAt": "Dernière connexion",
+    "profileCompleteness": "Complétude du profil",
+    "readOnlyHint": "Ce champ est géré par Logto et ne peut pas être modifié ici."
+  },
+  "notifications": {
+    "sectionTitle": "Préférences de notification",
+    "emailNotifications": "Notifications par email",
+    "smsNotifications": "Notifications SMS",
+    "marketingEmails": "Emails marketing"
+  },
+  "never": "Jamais",
+  "deactivate": {
+    "confirmTitle": "Désactiver l'utilisateur",
+    "confirmMessage": "Êtes-vous sûr de vouloir désactiver {{name}}? Il ne pourra plus accéder à l'application.",
+    "cancel": "Annuler",
+    "confirm": "Désactiver"
+  },
+  "reactivate": {
+    "confirmTitle": "Réactiver l'utilisateur",
+    "confirmMessage": "Êtes-vous sûr de vouloir réactiver {{name}}? Il pourra accéder à l'application de nouveau.",
+    "cancel": "Annuler",
+    "confirm": "Réactiver"
+  }
+}
