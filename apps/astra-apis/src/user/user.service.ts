@@ -1,29 +1,46 @@
 import type {User as IUser} from '@ids/data-models';
+import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, PagedResponseDto, toPagedDto} from '@ids/data-models';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
+import type {IDocumentQuery, QueryStatistics} from 'ravendb';
 import {createIdsBaseEntity, touchIdsBaseEntity} from '../common/entities/ids-base.entity';
+import {RavenDocumentStoreProvider} from '../infrastructure/ravendb/document-store.provider';
 import {RavenSessionFactory} from '../infrastructure/ravendb/session-factory';
 import type {CreateUserDto} from './dto/create-user-profile.dto';
 import type {RegisterUserDto, RegisterUserResponse} from './dto/register-user.dto.js';
 import type {UpdateUserDto} from './dto/update-user-profile.dto';
 import {UserResponseDto} from './dto/user-response.dto';
 import {User} from './entities/user.entity';
+import {Users_Search} from './indexes/users-search.index';
 import {LogtoManagementClient} from './logto-management.client';
 import {toUserDto} from './user.mapper';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
   private readonly _logger = new Logger(UserService.name);
 
   public constructor(
     private readonly _logtoClient: LogtoManagementClient,
     private readonly _sessionFactory: RavenSessionFactory,
+    private readonly _storeProvider: RavenDocumentStoreProvider,
   ) {}
+
+  public async onModuleInit(): Promise<void> {
+    try {
+      await new Users_Search().execute(this._storeProvider.getStore());
+    } catch (error) {
+      this._logger.warn(
+        'Failed to create Users/Search index — database may not exist yet',
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
 
   public async registerUser(registerDto: RegisterUserDto): Promise<RegisterUserResponse> {
     this._logger.log(`Registering user: ${registerDto.email}`);
@@ -32,12 +49,21 @@ export class UserService {
       throw new BadRequestException('Email and password are required');
     }
 
-    const logtoUser = await this._logtoClient.createUser({
-      primaryEmail: registerDto.email,
-      password: registerDto.password,
-      name: `${registerDto.firstName} ${registerDto.lastName}`,
-      username: registerDto.username,
-    });
+    let logtoUser: Awaited<ReturnType<LogtoManagementClient['createUser']>>;
+    try {
+      logtoUser = await this._logtoClient.createUser({
+        primaryEmail: registerDto.email,
+        password: registerDto.password,
+        name: `${registerDto.firstName} ${registerDto.lastName}`,
+        username: registerDto.username,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg === 'A user with this email already exists') {
+        throw new ConflictException('A user with this email already exists');
+      }
+      throw err;
+    }
 
     await this.createUserProfile({
       logtoUserId: logtoUser.id,
@@ -160,18 +186,92 @@ export class UserService {
     }
   }
 
-  public async deleteUserProfile(logtoUserId: string): Promise<void> {
+  public async findAll(options?: {
+    searchTerm?: string;
+    isDeleted?: boolean;
+    page?: number;
+    pageSize?: number;
+  }): Promise<PagedResponseDto<IUser>> {
+    const {
+      searchTerm,
+      isDeleted,
+      page = DEFAULT_PAGE,
+      pageSize = DEFAULT_PAGE_SIZE,
+    } = options ?? {};
+
+    const skip: number = (page - 1) * pageSize;
+
+    using session = this._sessionFactory.openSession();
+    let q: IDocumentQuery<User> = session.query<User>({indexName: 'Users/Search'});
+
+    if (isDeleted !== undefined) {
+      q = q.whereEquals('isDeleted', isDeleted);
+    }
+
+    if (searchTerm?.trim() && searchTerm.trim().length >= 2) {
+      q = q.search('query', `${searchTerm.trim()}*`, 'AND');
+    }
+
+    let stats!: QueryStatistics;
+    const users = await q
+      .statistics((s) => {
+        stats = s;
+      })
+      .skip(skip)
+      .take(pageSize)
+      .all();
+
+    return toPagedDto(users, page, pageSize, stats.totalResults);
+  }
+
+  public async deleteUserProfile(logtoUserId: string): Promise<IUser> {
     using session = this._sessionFactory.openSession();
     const user: User | null = await session.load<User>(`users/${logtoUserId}`);
     if (!user) {
-      return;
+      throw new NotFoundException(`User profile not found for Logto ID: ${logtoUserId}`);
     }
 
     user.isDeleted = true;
-    user.updatedBy = logtoUserId;
     touchIdsBaseEntity(user, logtoUserId);
     await session.store(user, user.id);
     await session.saveChanges();
+
+    // Best-effort Logto suspend — RavenDB soft-delete already committed
+    try {
+      await this._logtoClient.suspendUser(logtoUserId);
+    } catch (err) {
+      this._logger.error(
+        `Logto suspend failed for ${logtoUserId}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    return user;
+  }
+
+  public async restoreUserProfile(logtoUserId: string): Promise<IUser> {
+    using session = this._sessionFactory.openSession();
+    const user: User | null = await session.load<User>(`users/${logtoUserId}`);
+    if (!user) {
+      throw new NotFoundException(`User profile not found for Logto ID: ${logtoUserId}`);
+    }
+
+    user.isDeleted = false;
+    touchIdsBaseEntity(user, logtoUserId);
+    await session.store(user, user.id);
+    await session.saveChanges();
+
+    // Best-effort Logto unsuspend
+    try {
+      await this._logtoClient.unsuspendUser(logtoUserId);
+    } catch (err) {
+      this._logger.error(
+        `Logto unsuspend failed for ${logtoUserId}`,
+        err instanceof Error ? err.stack : String(err),
+      );
+    }
+
+    return user;
   }
 
   public async syncAllFromLogto(
@@ -295,11 +395,5 @@ export class UserService {
     await session.saveChanges();
 
     return user;
-  }
-
-  public async findAll(): Promise<IUser[]> {
-    using session = this._sessionFactory.openSession();
-    const all: User[] = await session.query<User>({collection: 'users'}).all();
-    return all.sort((left, right) => right.createdDate.getTime() - left.createdDate.getTime());
   }
 }

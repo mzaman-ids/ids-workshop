@@ -110,20 +110,13 @@ export class UserController {
   @ApiQuery({name: 'q', required: false, description: 'Search term'})
   @ApiResponse({status: 200, description: 'Matching users'})
   public async search(@Query('q') q?: string): Promise<SalespersonListItemDto[]> {
-    const all = await this._userService.findAll();
     const term: string | undefined = q?.trim().toLowerCase();
-    const filtered = term
-      ? all.filter(
-          (u) =>
-            u.displayName?.toLowerCase().includes(term) ||
-            u.email?.toLowerCase().includes(term) ||
-            u.username?.toLowerCase().includes(term),
-        )
-      : all;
-    return filtered
-      .filter((u) => !u.isDeleted)
-      .slice(0, 50)
-      .map((u) => ({id: u.id, displayName: u.displayName ?? u.email, email: u.email}));
+    const result = await this._userService.findAll({
+      searchTerm: term,
+      isDeleted: false,
+      pageSize: 50,
+    });
+    return result.items.map((u) => ({id: u.id, displayName: u.displayName ?? u.email, email: u.email}));
   }
 
   /**
@@ -250,7 +243,8 @@ export class UserController {
   @ApiOperation({summary: 'List all users'})
   @ApiResponse({status: 200, description: 'All user profiles'})
   public async findAll(): Promise<UserResponseDto[]> {
-    return toUserDtoList(await this._userService.findAll());
+    const result = await this._userService.findAll();
+    return toUserDtoList(result.items);
   }
 
   /**
