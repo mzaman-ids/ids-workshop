@@ -58,6 +58,14 @@ export const FEATURES: Feature[] = [
     status: 'partial',
   },
   {
+    id: 'vendors',
+    nameKey: 'navigation:features.vendors.name',
+    descriptionKey: 'navigation:features.vendors.description',
+    route: '/vendors',
+    category: 'admin',
+    status: 'partial' as FeatureStatus,
+  },
+  {
     id: 'users',
     nameKey: 'navigation:features.users.name',
     descriptionKey: 'navigation:features.users.description',

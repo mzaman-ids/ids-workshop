@@ -11,6 +11,7 @@ import {LocationModule} from './location/location.module';
 import {PartModule} from './part/part.module';
 import {SystemHealthModule} from './ping/systemhealth.module';
 import {UserModule} from './user/user.module';
+import {VendorModule} from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {UserModule} from './user/user.module';
     UserModule,
     LocationModule,
     PartModule,
+    VendorModule,
   ],
   controllers: [],
   providers: [

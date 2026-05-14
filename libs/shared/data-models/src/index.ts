@@ -5,5 +5,7 @@ export * from './lib/constants/constants.js';
 export * from './lib/constants/error-messages.js';
 export * from './lib/location/index.js';
 export * from './lib/money/index.js';
+export * from './lib/stock-adjustment/index.js';
 export * from './lib/telcom/index.js';
 export * from './lib/user/index.js';
+export * from './lib/vendor/index.js';

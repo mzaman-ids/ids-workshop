@@ -275,12 +275,13 @@ async function seed(): Promise<void> {
       await session.store(
         {
           id: `vendors/${vendor.code}`,
-          vendorNumber: vendor.code,
+          code: vendor.code,
           name: vendor.name ?? vendor.code,
+          terms: vendor.terms ?? null,
           createdDate: now,
           updatedDate: now,
           version: 1,
-          isDeleted: false,
+          isDeleted: vendor.isDeleted ?? false,
         },
         `vendors/${vendor.code}`,
       );
@@ -383,7 +384,7 @@ async function seed(): Promise<void> {
           partEntry.vendors.map(async (pv) => {
             const vendorDoc = await partSession.load<{
               id: string;
-              vendorNumber: string;
+              code: string;
               name: string;
             }>(`vendors/${pv.vendorCode}`);
             if (!vendorDoc) {
@@ -394,7 +395,7 @@ async function seed(): Promise<void> {
             return {
               vendor: {
                 id: vendorDoc.id,
-                vendorNumber: vendorDoc.vendorNumber,
+                code: vendorDoc.code,
                 name: vendorDoc.name,
               },
               vendorPartNumber: pv.vendorPartNumber,

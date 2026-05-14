@@ -534,6 +534,12 @@ export function Layout() {
           route: '/locations',
         },
         {
+          label: 'Vendors',
+          icon: <LocalShippingIcon color="inherit" />,
+          featureId: 'vendors',
+          route: '/vendors',
+        },
+        {
           label: t('navigation:users'),
           icon: <BadgeIcon color="inherit" />,
           featureId: 'users',

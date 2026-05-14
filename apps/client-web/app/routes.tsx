@@ -22,6 +22,11 @@ export default [
       route('locations/create', './pages/locations/LocationCreate.tsx'),
       route('locations/:id', './pages/locations/LocationDetail.tsx'),
 
+      // Vendors
+      route('vendors', './pages/vendors/VendorList.tsx'),
+      route('vendors/create', './pages/vendors/VendorCreate.tsx'),
+      route('vendors/:id', './pages/vendors/VendorDetail.tsx'),
+
       // User profile
       route('user-settings', './pages/UserSettings.tsx'),
 
