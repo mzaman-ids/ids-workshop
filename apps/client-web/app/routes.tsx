@@ -22,6 +22,11 @@ export default [
       route('locations/create', './pages/locations/LocationCreate.tsx'),
       route('locations/:id', './pages/locations/LocationDetail.tsx'),
 
+      // Users
+      route('users', './pages/users/UserList.tsx'),
+      route('users/create', './pages/users/UserCreate.tsx'),
+      route('users/:logtoUserId', './pages/users/UserDetail.tsx'),
+
       // User profile
       route('user-settings', './pages/UserSettings.tsx'),
 
