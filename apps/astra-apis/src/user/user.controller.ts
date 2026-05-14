@@ -29,6 +29,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type {Response} from 'express';
+import {PagedResponseDto} from '@ids/data-models';
 import {Auth} from '../auth/auth.decorator';
 import {AuthInfo} from '../auth/auth-utils';
 import {Public} from '../auth/public.decorator';
@@ -37,6 +38,7 @@ import {LocationService} from '../location/location.service';
 import type {RegisterUserDto, RegisterUserResponse} from './dto/register-user.dto.js';
 import {UpdateUserDto} from './dto/update-user-profile.dto';
 import {UserContextResponseDto} from './dto/user-context-response.dto';
+import {UserListQueryDto} from './dto/user-list.query.dto';
 import {UserResponseDto} from './dto/user-response.dto';
 import {toUserDto, toUserDtoList} from './user.mapper';
 import {UserService} from './user.service';
@@ -240,11 +242,25 @@ export class UserController {
    * GET /api/user
    */
   @Get()
-  @ApiOperation({summary: 'List all users'})
-  @ApiResponse({status: 200, description: 'All user profiles'})
-  public async findAll(): Promise<UserResponseDto[]> {
-    const result = await this._userService.findAll();
-    return toUserDtoList(result.items);
+  @ApiOperation({summary: 'List users with pagination and search'})
+  @ApiQuery({name: 'page', required: false, type: Number})
+  @ApiQuery({name: 'pageSize', required: false, type: Number})
+  @ApiQuery({name: 'searchTerm', required: false, type: String})
+  @ApiQuery({name: 'isDeleted', required: false, type: Boolean})
+  @ApiResponse({status: 200, description: 'Paginated user profiles'})
+  public async findAll(@Query() query: UserListQueryDto): Promise<PagedResponseDto<UserResponseDto>> {
+    const isDeleted: boolean | undefined =
+      query.isDeleted === undefined ? undefined : query.isDeleted === 'true';
+    const result = await this._userService.findAll({
+      searchTerm: query.searchTerm,
+      isDeleted,
+      page: query.page,
+      pageSize: query.pageSize,
+    });
+    return {
+      ...result,
+      items: toUserDtoList(result.items),
+    };
   }
 
   /**
@@ -267,6 +283,32 @@ export class UserController {
   @ApiResponse({status: 404, description: 'User not found'})
   public async findOne(@Param('logtoUserId') logtoUserId: string): Promise<UserResponseDto> {
     return toUserDto(await this._userService.findByLogtoId(logtoUserId));
+  }
+
+  /**
+   * DELETE /api/user/:logtoUserId
+   * Soft-deletes user in RavenDB and suspends in Logto (best-effort)
+   */
+  @Delete(':logtoUserId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Deactivate user (soft-delete + Logto suspend)'})
+  @ApiResponse({status: 200, description: 'Deactivated user profile'})
+  @ApiResponse({status: 404, description: 'User not found'})
+  public async deactivate(@Param('logtoUserId') logtoUserId: string): Promise<UserResponseDto> {
+    return toUserDto(await this._userService.deleteUserProfile(logtoUserId));
+  }
+
+  /**
+   * POST /api/user/:logtoUserId/restore
+   * Un-soft-deletes user in RavenDB and unsuspends in Logto (best-effort)
+   */
+  @Post(':logtoUserId/restore')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({summary: 'Restore deactivated user (un-soft-delete + Logto unsuspend)'})
+  @ApiResponse({status: 200, description: 'Restored user profile'})
+  @ApiResponse({status: 404, description: 'User not found'})
+  public async restore(@Param('logtoUserId') logtoUserId: string): Promise<UserResponseDto> {
+    return toUserDto(await this._userService.restoreUserProfile(logtoUserId));
   }
 
   /**
