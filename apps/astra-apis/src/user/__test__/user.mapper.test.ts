@@ -47,6 +47,9 @@ describe('UserMapper', () => {
         profileCompleteness: 85,
         lastLoginAt: user.lastLoginAt,
         hasProfilePhoto: false,
+        isDeleted: false,
+        createdDate: user.createdDate,
+        updatedDate: user.updatedDate,
       });
     });
 
