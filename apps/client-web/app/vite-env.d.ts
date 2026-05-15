@@ -4,6 +4,9 @@ interface ImportMetaEnv {
   readonly VITE_API_URL: string;
   readonly VITE_LOGTO_ENDPOINT: string;
   readonly VITE_LOGTO_APP_ID: string;
+  readonly VITE_APP_VERSION: string;
+  readonly VITE_GIT_SHA: string;
+  readonly VITE_BUILD_DATE: string;
 }
 
 interface ImportMeta {
