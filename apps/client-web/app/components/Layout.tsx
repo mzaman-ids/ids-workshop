@@ -543,7 +543,7 @@ export function Layout() {
           label: t('navigation:users'),
           icon: <BadgeIcon color="inherit" />,
           featureId: 'users',
-          route: null,
+          route: '/users',
         },
         {
           label: t('navigation:systemConfig'),

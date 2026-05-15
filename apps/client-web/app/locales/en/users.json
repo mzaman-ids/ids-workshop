@@ -5,15 +5,17 @@
   "usersFound": "users found",
   "userNotFound": "User not found",
   "backToUsers": "Back to Users",
+  "createUser": "Create User",
+  "syncFromLogto": "Sync from Logto",
   "saving": "Saving...",
   "cancel": "Cancel",
   "updateSuccess": "User profile updated successfully.",
-  "unsavedChanges": {
-    "editMessage": "Changes made to this user profile will be lost. Are you sure you want to cancel?"
-  },
+  "createSuccess": "User created successfully.",
+  "never": "Never",
   "pageTitle": {
     "edit": "Edit User Profile",
-    "save": "Save Changes"
+    "save": "Save Changes",
+    "create": "Create User"
   },
   "userList": {
     "displayName": "Name",
@@ -21,6 +23,11 @@
     "username": "Username",
     "lastLogin": "Last Login",
     "profileCompleteness": "Profile"
+  },
+  "filter": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All"
   },
   "fields": {
     "logtoUserId": "Logto User ID",
@@ -31,6 +38,9 @@
     "bio": "Bio",
     "timezone": "Timezone",
     "preferredLanguage": "Preferred Language",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "lastLoginAt": "Last Login",
     "profileCompleteness": "Profile Completeness",
     "readOnlyHint": "This field is managed by Logto and cannot be edited here."
@@ -41,5 +51,32 @@
     "smsNotifications": "SMS Notifications",
     "marketingEmails": "Marketing Emails"
   },
-  "never": "Never"
+  "photo": {
+    "sectionTitle": "Profile Photo",
+    "upload": "Upload Photo",
+    "delete": "Delete Photo",
+    "uploadError": "Failed to upload photo. Please try again.",
+    "deleteError": "Failed to delete photo. Please try again."
+  },
+  "deactivate": {
+    "button": "Deactivate User",
+    "confirmTitle": "Deactivate User",
+    "confirmMessage": "Are you sure you want to deactivate {{name}}? They will no longer be able to sign in.",
+    "confirm": "Deactivate",
+    "cancel": "Cancel"
+  },
+  "reactivate": {
+    "button": "Reactivate User",
+    "confirmTitle": "Reactivate User",
+    "confirmMessage": "Are you sure you want to reactivate {{name}}? They will be able to sign in again.",
+    "confirm": "Reactivate",
+    "cancel": "Cancel"
+  },
+  "create": {
+    "emailConflict": "A user with this email already exists.",
+    "error": "Failed to create user. Please try again."
+  },
+  "unsavedChanges": {
+    "editMessage": "Changes made to this user profile will be lost. Are you sure you want to cancel?"
+  }
 }

@@ -1,1 +1,82 @@
-{}
+{
+  "title": "Utilisateurs",
+  "search": "Rechercher des utilisateurs...",
+  "noResults": "Aucun utilisateur trouvé",
+  "usersFound": "utilisateurs trouvés",
+  "userNotFound": "Utilisateur non trouvé",
+  "backToUsers": "Retour aux utilisateurs",
+  "createUser": "Créer un utilisateur",
+  "syncFromLogto": "Synchroniser depuis Logto",
+  "saving": "Enregistrement...",
+  "cancel": "Annuler",
+  "updateSuccess": "Profil utilisateur mis à jour avec succès.",
+  "createSuccess": "Utilisateur créé avec succès.",
+  "never": "Jamais",
+  "pageTitle": {
+    "edit": "Modifier le profil utilisateur",
+    "save": "Enregistrer les modifications",
+    "create": "Créer un utilisateur"
+  },
+  "userList": {
+    "displayName": "Nom",
+    "email": "E-mail",
+    "username": "Nom d'utilisateur",
+    "lastLogin": "Dernière connexion",
+    "profileCompleteness": "Profil"
+  },
+  "filter": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "all": "Tous"
+  },
+  "fields": {
+    "logtoUserId": "ID utilisateur Logto",
+    "email": "E-mail",
+    "username": "Nom d'utilisateur",
+    "displayName": "Nom d'affichage",
+    "nickname": "Surnom",
+    "bio": "Biographie",
+    "timezone": "Fuseau horaire",
+    "preferredLanguage": "Langue préférée",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "lastLoginAt": "Dernière connexion",
+    "profileCompleteness": "Complétude du profil",
+    "readOnlyHint": "Ce champ est géré par Logto et ne peut pas être modifié ici."
+  },
+  "notifications": {
+    "sectionTitle": "Préférences de notification",
+    "emailNotifications": "Notifications par e-mail",
+    "smsNotifications": "Notifications par SMS",
+    "marketingEmails": "E-mails marketing"
+  },
+  "photo": {
+    "sectionTitle": "Photo de profil",
+    "upload": "Télécharger une photo",
+    "delete": "Supprimer la photo",
+    "uploadError": "Échec du téléchargement de la photo. Veuillez réessayer.",
+    "deleteError": "Échec de la suppression de la photo. Veuillez réessayer."
+  },
+  "deactivate": {
+    "button": "Désactiver l'utilisateur",
+    "confirmTitle": "Désactiver l'utilisateur",
+    "confirmMessage": "Êtes-vous sûr de vouloir désactiver {{name}} ? Il ne pourra plus se connecter.",
+    "confirm": "Désactiver",
+    "cancel": "Annuler"
+  },
+  "reactivate": {
+    "button": "Réactiver l'utilisateur",
+    "confirmTitle": "Réactiver l'utilisateur",
+    "confirmMessage": "Êtes-vous sûr de vouloir réactiver {{name}} ? Il pourra à nouveau se connecter.",
+    "confirm": "Réactiver",
+    "cancel": "Annuler"
+  },
+  "create": {
+    "emailConflict": "Un utilisateur avec cet e-mail existe déjà.",
+    "error": "Échec de la création de l'utilisateur. Veuillez réessayer."
+  },
+  "unsavedChanges": {
+    "editMessage": "Les modifications apportées à ce profil utilisateur seront perdues. Êtes-vous sûr de vouloir annuler ?"
+  }
+}
