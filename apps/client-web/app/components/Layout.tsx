@@ -994,10 +994,28 @@ export function Layout() {
           width: `calc(100% - ${sidebarWidth}px)`,
           transition: `width ${TRANSITION_DURATION} ease`,
           minHeight: `calc(100vh - ${APPBAR_HEIGHT}px)`,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <NetworkAlert />
-        <Outlet />
+        <Box sx={{flexGrow: 1}}>
+          <NetworkAlert />
+          <Outlet />
+        </Box>
+        <Box
+          component="footer"
+          sx={{
+            mt: 2,
+            pt: 1,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            © {new Date().getFullYear()} Integrated Dealers System. All rights reserved.
+          </Typography>
+        </Box>
       </Box>
 
       {/* Coming Soon Dialog */}
