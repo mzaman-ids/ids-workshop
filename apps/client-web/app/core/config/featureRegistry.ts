@@ -40,6 +40,14 @@ export const FEATURES: Feature[] = [
     status: 'partial',
   },
   {
+    id: 'stock-adjustments',
+    nameKey: 'navigation:features.stockAdjustments.name',
+    descriptionKey: 'navigation:features.stockAdjustments.description',
+    route: '/stock-adjustments',
+    category: 'inventory',
+    status: 'partial',
+  },
+  {
     id: 'work-order',
     nameKey: 'navigation:features.workOrder.name',
     descriptionKey: 'navigation:features.workOrder.description',
@@ -56,6 +64,14 @@ export const FEATURES: Feature[] = [
     route: '/locations',
     category: 'admin',
     status: 'partial',
+  },
+  {
+    id: 'vendors',
+    nameKey: 'navigation:features.vendors.name',
+    descriptionKey: 'navigation:features.vendors.description',
+    route: '/vendors',
+    category: 'admin',
+    status: 'partial' as FeatureStatus,
   },
   {
     id: 'users',

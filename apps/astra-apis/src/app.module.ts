@@ -10,7 +10,9 @@ import {RavenDbModule} from './infrastructure/ravendb/ravendb.module';
 import {LocationModule} from './location/location.module';
 import {PartModule} from './part/part.module';
 import {SystemHealthModule} from './ping/systemhealth.module';
+import {StockAdjustmentsModule} from './stock-adjustments/stock-adjustments.module';
 import {UserModule} from './user/user.module';
+import {VendorModule} from './vendor/vendor.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import {UserModule} from './user/user.module';
     UserModule,
     LocationModule,
     PartModule,
+    VendorModule,
+    StockAdjustmentsModule,
   ],
   controllers: [],
   providers: [

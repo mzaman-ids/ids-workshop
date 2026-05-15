@@ -7,14 +7,15 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!docs"]
+    "includes": ["**", "!docs", "!.worktrees"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "formatWithErrors": false
+    "formatWithErrors": false,
+    "lineEnding": "lf"
   },
   "javascript": {
     "parser": {

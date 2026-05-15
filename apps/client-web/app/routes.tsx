@@ -26,6 +26,14 @@ export default [
       route('users', './pages/users/UserList.tsx'),
       route('users/create', './pages/users/UserCreate.tsx'),
       route('users/:logtoUserId', './pages/users/UserDetail.tsx'),
+      // Vendors
+      route('vendors', './pages/vendors/VendorList.tsx'),
+      route('vendors/create', './pages/vendors/VendorCreate.tsx'),
+      route('vendors/:id', './pages/vendors/VendorDetail.tsx'),
+
+      // Stock Adjustments
+      route('stock-adjustments', './pages/stock-adjustments/StockAdjustmentList.tsx'),
+      route('stock-adjustments/create', './pages/stock-adjustments/StockAdjustmentCreate.tsx'),
 
       // User profile
       route('user-settings', './pages/UserSettings.tsx'),

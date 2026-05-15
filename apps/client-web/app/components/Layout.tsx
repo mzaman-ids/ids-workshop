@@ -289,7 +289,7 @@ export function Layout() {
           label: t('navigation:stockAdjustments'),
           icon: <ShelvesIcon color="inherit" />,
           featureId: 'stock-adjustments',
-          route: null,
+          route: '/stock-adjustments',
         },
       ],
     },
@@ -532,6 +532,12 @@ export function Layout() {
           icon: <AddLocationAltIcon color="inherit" />,
           featureId: 'locations',
           route: '/locations',
+        },
+        {
+          label: 'Vendors',
+          icon: <LocalShippingIcon color="inherit" />,
+          featureId: 'vendors',
+          route: '/vendors',
         },
         {
           label: t('navigation:users'),
