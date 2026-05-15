@@ -350,4 +350,44 @@ export class LogtoManagementClient {
     this._logger.log(`getAllOrganizations: fetched ${all.length} total organizations`);
     return all;
   }
+
+  /**
+   * Suspend a user in Logto (prevents login)
+   */
+  public async suspendUser(userId: string): Promise<void> {
+    const token: string = await this.getAccessToken();
+    const response = await fetch(`${this.endpoint}/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({isSuspended: true}),
+    });
+    if (!response.ok) {
+      const error = (await response.json()) as {code?: string; message?: string};
+      this._logger.error(`Failed to suspend user ${userId} in Logto: ${JSON.stringify(error)}`);
+      throw new Error(error.message || 'Failed to suspend user in Logto');
+    }
+  }
+
+  /**
+   * Unsuspend a user in Logto (re-enables login)
+   */
+  public async unsuspendUser(userId: string): Promise<void> {
+    const token: string = await this.getAccessToken();
+    const response = await fetch(`${this.endpoint}/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({isSuspended: false}),
+    });
+    if (!response.ok) {
+      const error = (await response.json()) as {code?: string; message?: string};
+      this._logger.error(`Failed to unsuspend user ${userId} in Logto: ${JSON.stringify(error)}`);
+      throw new Error(error.message || 'Failed to unsuspend user in Logto');
+    }
+  }
 }
