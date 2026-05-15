@@ -15,9 +15,9 @@ export type PartVendorRow = v.InferOutput<typeof vendorRowSchema>;
 // ── Bin row ─────────────────────────────────────────────────────────────────
 
 const binRowSchema = v.object({
-  binId: v.optional(v.string()),
-  binCode: v.optional(v.string()),
-  qty: v.optional(v.string()),
+  binCode: v.string(),
+  description: v.nullable(v.string()),
+  isMain: v.boolean(),
 });
 
 export type PartBinRow = v.InferOutput<typeof binRowSchema>;
@@ -115,6 +115,29 @@ export const partUpdateSchema = applySharedChecks(
 
 export type PartUpdateFormValues = v.InferOutput<typeof partUpdateSchema>;
 
-// ── PartFormValues (union for shared use) ────────────────────────────────────
+// ── PartFormValues (flat object covering all form fields) ────────────────────
 
-export type PartFormValues = PartCreateFormValues | PartUpdateFormValues;
+export type PartFormValues = {
+  partNumber: string;
+  description: string;
+  status: string;
+  comments: string;
+  listPrice: string;
+  priceGroup: string;
+  glGroup: string;
+  taxCode: string;
+  bypassPriceUpdate: boolean;
+  promptForSerialNumber: boolean;
+  sellUom: string;
+  purchaseUom: string;
+  salePurchaseRatio: string;
+  shippingWeight: string;
+  shippingUnit: string;
+  caseQty: string;
+  minQty: string;
+  maxQty: string;
+  minDays: string;
+  minOrder: string;
+  vendors: PartVendorRow[];
+  bins: PartBinRow[];
+};
