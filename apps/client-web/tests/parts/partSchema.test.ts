@@ -112,6 +112,20 @@ describe('partCreateSchema', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it('rejects negative listPrice', () => {
+    const result = safeParse(partCreateSchema, {...validCreate, listPrice: '-5'});
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts shippingWeight of 0 without shippingUnit', () => {
+    const result = safeParse(partCreateSchema, {
+      ...validCreate,
+      shippingWeight: '0',
+      shippingUnit: '',
+    });
+    expect(result.success).toBe(true);
+  });
 });
 
 describe('partUpdateSchema', () => {

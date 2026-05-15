@@ -28,7 +28,10 @@ const optionalNumericString = v.union([
   v.literal(''),
   v.pipe(
     v.string(),
-    v.check((s) => !Number.isNaN(parseFloat(s)) && parseFloat(s) >= 0, 'Must be >= 0'),
+    v.check((s) => {
+      const n = parseFloat(s);
+      return !Number.isNaN(n) && n >= 0;
+    }, 'Must be >= 0'),
   ),
 ]);
 
@@ -115,29 +118,6 @@ export const partUpdateSchema = applySharedChecks(
 
 export type PartUpdateFormValues = v.InferOutput<typeof partUpdateSchema>;
 
-// ── PartFormValues (flat object covering all form fields) ────────────────────
+// ── PartFormValues (alias for PartCreateFormValues) ──────────────────────────
 
-export type PartFormValues = {
-  partNumber: string;
-  description: string;
-  status: string;
-  comments: string;
-  listPrice: string;
-  priceGroup: string;
-  glGroup: string;
-  taxCode: string;
-  bypassPriceUpdate: boolean;
-  promptForSerialNumber: boolean;
-  sellUom: string;
-  purchaseUom: string;
-  salePurchaseRatio: string;
-  shippingWeight: string;
-  shippingUnit: string;
-  caseQty: string;
-  minQty: string;
-  maxQty: string;
-  minDays: string;
-  minOrder: string;
-  vendors: PartVendorRow[];
-  bins: PartBinRow[];
-};
+export type PartFormValues = PartCreateFormValues;
