@@ -81,7 +81,7 @@ export function PartIdentitySection({
               disabled={mode === 'edit'}
               error={!!partIdConflict || !!errors.partNumber}
               helperText={
-                partIdConflict ? 'A part with this ID already exists' : errors.partNumber?.message
+                partIdConflict ? t('create.validation.partIdConflict') : errors.partNumber?.message
               }
             />
           )

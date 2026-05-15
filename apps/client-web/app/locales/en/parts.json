@@ -121,6 +121,7 @@
       "maxMustBeGreaterThanMin": "Max Qty must be greater than or equal to Min Qty.",
       "invalidNumber": "Must be a valid number.",
       "shippingUnitRequired": "Shipping unit is required when weight is entered.",
+      "partIdConflict": "A part with this ID already exists",
       "validationSummary": "Please correct the following fields: {{fields}}"
     }
   },

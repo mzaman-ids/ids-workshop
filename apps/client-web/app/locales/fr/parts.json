@@ -121,6 +121,7 @@
       "maxMustBeGreaterThanMin": "La Qté Max doit être supérieure ou égale à la Qté Min.",
       "invalidNumber": "Doit être un nombre valide.",
       "shippingUnitRequired": "L'unité d'expédition est requise lorsqu'un poids est saisi.",
+      "partIdConflict": "Une pièce avec cet ID existe déjà",
       "validationSummary": "Veuillez corriger les champs suivants : {{fields}}"
     }
   },
