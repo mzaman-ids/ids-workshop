@@ -1,4 +1,4 @@
-import {useLogto} from '@logto/react';
+import { useLogto } from '@logto/react';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -16,6 +16,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
 import CarRepairIcon from '@mui/icons-material/CarRepair';
+import CheckIcon from '@mui/icons-material/Check';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import CodeIcon from '@mui/icons-material/Code';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
@@ -50,6 +51,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import SummarizeIcon from '@mui/icons-material/Summarize';
+import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
 import SyncIcon from '@mui/icons-material/Sync';
 import TaskIcon from '@mui/icons-material/Task';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
@@ -78,20 +80,20 @@ import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import {getFeatureById, STATUS_CONFIG} from 'core/config/featureRegistry';
-import {useAuth} from 'core/contexts/auth/useAuth';
-import {getUserPhotoUrl} from 'core/services/userPhotoUrl';
-import {userQueries} from 'pages/users/queries/userQueries';
-import {type ReactNode, useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {Link, Outlet, useNavigate, useLocation as useRouterLocation} from 'react-router';
-import {useColorMode} from '../contexts/ColorModeContext';
+import { getFeatureById, STATUS_CONFIG } from 'core/config/featureRegistry';
+import { useAuth } from 'core/contexts/auth/useAuth';
+import { getUserPhotoUrl } from 'core/services/userPhotoUrl';
+import { userQueries } from 'pages/users/queries/userQueries';
+import { type ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, Outlet, useNavigate, useLocation as useRouterLocation } from 'react-router';
+import { useColorMode } from '../contexts/ColorModeContext';
 import RentHangingSignIcon from '../icons/RentHangingSignIcon';
-import {ComingSoonDialog} from './ComingSoonDialog';
-import {IdsLogoImage} from './IdsLogoImage';
-import {LanguageSwitcher} from './LanguageSwitcher';
-import {LocationSwitcher} from './LocationSwitcher';
-import {NetworkAlert} from './NetworkAlert';
+import { ComingSoonDialog } from './ComingSoonDialog';
+import { IdsLogoImage } from './IdsLogoImage';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { LocationSwitcher } from './LocationSwitcher';
+import { NetworkAlert } from './NetworkAlert';
 
 const SIDEBAR_EXPANDED_WIDTH = 260;
 const SIDEBAR_COLLAPSED_WIDTH = 68;
@@ -142,6 +144,7 @@ export function Layout() {
     return localStorage.getItem(STORAGE_KEY) === 'true';
   });
   const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
+  const [themeAnchorEl, setThemeAnchorEl] = useState<HTMLElement | null>(null);
   const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState<string | false>(false);
   const [hasProfilePhoto, setHasProfilePhoto] = useState(false);
@@ -151,10 +154,10 @@ export function Layout() {
   // --- Hooks ---
   const navigate = useNavigate();
   const routerLocation = useRouterLocation();
-  const {signOut} = useLogto();
-  const {userClaims, accessToken} = useAuth();
-  const {mode, toggleColorMode} = useColorMode();
-  const {t} = useTranslation(['common', 'navigation']);
+  const { signOut } = useLogto();
+  const { userClaims, accessToken } = useAuth();
+  const { preference, resolvedMode, setPreference } = useColorMode();
+  const { t } = useTranslation(['common', 'navigation']);
 
   // --- Effects ---
   useEffect(() => {
@@ -166,7 +169,7 @@ export function Layout() {
       return;
     }
     userQueries
-      .fetchById({logtoUserId: userClaims.sub, token: accessToken})
+      .fetchById({ logtoUserId: userClaims.sub, token: accessToken })
       .then((profile) => {
         setHasProfilePhoto(profile.hasProfilePhoto);
       })
@@ -177,7 +180,7 @@ export function Layout() {
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const {logtoUserId, hasProfilePhoto: updated, ts} = (e as CustomEvent).detail;
+      const { logtoUserId, hasProfilePhoto: updated, ts } = (e as CustomEvent).detail;
       if (logtoUserId === userClaims?.sub) {
         setHasProfilePhoto(updated);
         setPhotoCacheBust(ts);
@@ -577,7 +580,7 @@ export function Layout() {
     const button = (
       <ListItemButton
         onClick={handler}
-        {...(item.route ? {component: Link, to: item.route} : {})}
+        {...(item.route ? { component: Link, to: item.route } : {})}
         sx={{
           minHeight: 32,
           py: 0.25,
@@ -604,7 +607,7 @@ export function Layout() {
         {!collapsed && (
           <ListItemText
             primary={item.label}
-            primaryTypographyProps={{variant: 'body2', fontSize: '0.8rem'}}
+            primaryTypographyProps={{ variant: 'body2', fontSize: '0.8rem' }}
           />
         )}
       </ListItemButton>
@@ -635,12 +638,12 @@ export function Layout() {
         disableGutters
         elevation={0}
         sx={{
-          '&:before': {display: 'none'},
+          '&:before': { display: 'none' },
           backgroundColor: 'transparent',
         }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{fontSize: 16}} />}
+          expandIcon={<ExpandMoreIcon sx={{ fontSize: 16 }} />}
           sx={{
             minHeight: 34,
             px: 2,
@@ -651,14 +654,14 @@ export function Layout() {
             },
           }}
         >
-          <Box sx={{display: 'flex', alignItems: 'center', gap: 0.75}}>
-            <Box sx={{fontSize: 18, display: 'flex'}}>{category.icon}</Box>
-            <Typography variant="body2" sx={{fontWeight: 500, fontSize: '0.8125rem'}}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Box sx={{ fontSize: 18, display: 'flex' }}>{category.icon}</Box>
+            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.8125rem' }}>
               {category.label}
             </Typography>
           </Box>
         </AccordionSummary>
-        <AccordionDetails sx={{p: 0}}>
+        <AccordionDetails sx={{ p: 0 }}>
           <List disablePadding dense>
             {category.items.map(renderNavItem)}
           </List>
@@ -676,7 +679,7 @@ export function Layout() {
             mx: 'auto',
             display: 'flex',
             color: 'text.secondary',
-            '&:hover': {color: 'primary.main', backgroundColor: 'action.hover'},
+            '&:hover': { color: 'primary.main', backgroundColor: 'action.hover' },
           }}
           aria-label={category.label}
           onClick={() => {
@@ -698,7 +701,7 @@ export function Layout() {
   // --- Render: User profile avatar ---
   const renderAvatar = (size: number) => {
     if (profilePhotoUrl) {
-      return <Avatar key={photoCacheBust} src={profilePhotoUrl} sx={{width: size, height: size}} />;
+      return <Avatar key={photoCacheBust} src={profilePhotoUrl} sx={{ width: size, height: size }} />;
     }
     if (userInitials) {
       return (
@@ -715,12 +718,12 @@ export function Layout() {
         </Avatar>
       );
     }
-    return <AccountCircleIcon sx={{fontSize: size}} />;
+    return <AccountCircleIcon sx={{ fontSize: size }} />;
   };
 
   // --- Render ---
   return (
-    <Box sx={{display: 'flex', minHeight: '100vh'}}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       {/* AppBar — to the right of sidebar */}
       <AppBar
         position="fixed"
@@ -749,21 +752,74 @@ export function Layout() {
             variant="h6"
             noWrap
             component="div"
-            sx={{flexGrow: 1, fontWeight: 600, color: 'primary.contrastText'}}
+            sx={{ flexGrow: 1, fontWeight: 600, color: 'primary.contrastText' }}
           >
             {t('common:appName')}
           </Typography>
 
-          <Tooltip title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+          <Tooltip title="Theme">
             <IconButton
-              aria-label="toggle dark mode"
+              aria-label="theme"
               color="inherit"
-              onClick={toggleColorMode}
-              sx={{ml: 1}}
+              onClick={(e) => setThemeAnchorEl(e.currentTarget)}
+              sx={{ ml: 1 }}
             >
-              {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              {preference === 'system' ? (
+                <SettingsBrightnessIcon />
+              ) : resolvedMode === 'dark' ? (
+                <DarkModeIcon />
+              ) : (
+                <LightModeIcon />
+              )}
             </IconButton>
           </Tooltip>
+          <Menu
+            anchorEl={themeAnchorEl}
+            open={Boolean(themeAnchorEl)}
+            onClose={() => setThemeAnchorEl(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <MenuItem
+              selected={preference === 'light'}
+              onClick={() => {
+                setPreference('light');
+                setThemeAnchorEl(null);
+              }}
+            >
+              <ListItemIcon>
+                <LightModeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Light</ListItemText>
+              {preference === 'light' && <CheckIcon fontSize="small" sx={{ ml: 1 }} />}
+            </MenuItem>
+            <MenuItem
+              selected={preference === 'dark'}
+              onClick={() => {
+                setPreference('dark');
+                setThemeAnchorEl(null);
+              }}
+            >
+              <ListItemIcon>
+                <DarkModeIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Dark</ListItemText>
+              {preference === 'dark' && <CheckIcon fontSize="small" sx={{ ml: 1 }} />}
+            </MenuItem>
+            <MenuItem
+              selected={preference === 'system'}
+              onClick={() => {
+                setPreference('system');
+                setThemeAnchorEl(null);
+              }}
+            >
+              <ListItemIcon>
+                <SettingsBrightnessIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>System</ListItemText>
+              {preference === 'system' && <CheckIcon fontSize="small" sx={{ ml: 1 }} />}
+            </MenuItem>
+          </Menu>
 
           <LanguageSwitcher />
 
@@ -773,7 +829,7 @@ export function Layout() {
               color="inherit"
               onClick={handleProfileMenuOpen}
               aria-label="profile menu"
-              sx={{ml: 0.5}}
+              sx={{ ml: 0.5 }}
             >
               {renderAvatar(32)}
             </IconButton>
@@ -782,8 +838,8 @@ export function Layout() {
             anchorEl={profileAnchorEl}
             open={Boolean(profileAnchorEl)}
             onClose={handleProfileMenuClose}
-            anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-            transformOrigin={{vertical: 'top', horizontal: 'right'}}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
             <MenuItem onClick={handleUserSettings}>
               <ListItemIcon>
@@ -835,7 +891,7 @@ export function Layout() {
               onClick={handleToggleSidebar}
               size="small"
               aria-label="expand sidebar"
-              sx={{color: 'text.secondary', '&:hover': {color: 'primary.main'}}}
+              sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
             >
               <MenuIcon fontSize="small" />
             </IconButton>
@@ -843,13 +899,13 @@ export function Layout() {
             <>
               <IdsLogoImage
                 width={120}
-                sxExtras={mode === 'dark' ? {filter: 'brightness(0) invert(1)'} : {}}
+                sxExtras={resolvedMode === 'dark' ? { filter: 'brightness(0) invert(1)' } : {}}
               />
               <IconButton
                 onClick={handleToggleSidebar}
                 size="small"
                 aria-label="collapse sidebar"
-                sx={{color: 'text.secondary', '&:hover': {color: 'primary.main'}}}
+                sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
               >
                 <MenuOpenIcon fontSize="small" />
               </IconButton>
@@ -860,17 +916,17 @@ export function Layout() {
         <Divider />
 
         {/* Scrollable nav area */}
-        <Box sx={{flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', py: 0.5}}>
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', py: 0.5 }}>
           {/* Home */}
           {collapsed ? (
-            <Box sx={{display: 'flex', justifyContent: 'center', py: 0.5}}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
               <Tooltip title={t('navigation:home')} placement="right">
                 <IconButton
                   onClick={handleNavigate('/')}
                   sx={{
                     color: isActiveRoute('/') ? 'primary.main' : 'text.secondary',
                     backgroundColor: isActiveRoute('/') ? 'action.selected' : 'transparent',
-                    '&:hover': {color: 'primary.main', backgroundColor: 'action.hover'},
+                    '&:hover': { color: 'primary.main', backgroundColor: 'action.hover' },
                   }}
                   aria-label={t('navigation:home')}
                 >
@@ -889,22 +945,22 @@ export function Layout() {
                     borderLeft: isActiveRoute('/') ? '3px solid' : '3px solid transparent',
                     borderLeftColor: isActiveRoute('/') ? 'primary.main' : 'transparent',
                     backgroundColor: isActiveRoute('/') ? 'action.selected' : 'transparent',
-                    '&:hover': {backgroundColor: 'action.hover'},
+                    '&:hover': { backgroundColor: 'action.hover' },
                   }}
                 >
-                  <ListItemIcon sx={{minWidth: 36, mr: 1}}>
+                  <ListItemIcon sx={{ minWidth: 36, mr: 1 }}>
                     <HomeIcon color="primary" />
                   </ListItemIcon>
                   <ListItemText
                     primary={t('navigation:home')}
-                    primaryTypographyProps={{variant: 'body2'}}
+                    primaryTypographyProps={{ variant: 'body2' }}
                   />
                 </ListItemButton>
               </ListItem>
             </List>
           )}
 
-          <Divider sx={{my: 0.5}} />
+          <Divider sx={{ my: 0.5 }} />
 
           {/* Categories */}
           {collapsed ? (

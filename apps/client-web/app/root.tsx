@@ -1,14 +1,14 @@
-import type {LogtoConfig} from '@logto/react';
-import {LogtoProvider, UserScope} from '@logto/react';
+import type { LogtoConfig } from '@logto/react';
+import { LogtoProvider, UserScope } from '@logto/react';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import {ThemeProvider} from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import {useEffect, useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
-import type {LinksFunction, MetaFunction} from 'react-router';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { LinksFunction, MetaFunction } from 'react-router';
 import {
   isRouteErrorResponse,
   Links,
@@ -18,15 +18,15 @@ import {
   ScrollRestoration,
   useRouteError,
 } from 'react-router';
-import {AppLoading} from './components/AppLoading';
-import {ColorModeProvider, useColorMode} from './contexts/ColorModeContext';
-import {API_CONFIG} from './core/config/api';
-import {AUTH_CONFIG} from './core/config/auth';
-import {AuthProvider} from './core/contexts/auth/AuthProvider';
-import {LocationChangeGuardProvider} from './core/contexts/location/LocationChangeGuardContext';
-import {LocationProvider} from './core/contexts/location/LocationProvider';
-import {QueryProvider} from './core/queries/QueryProvider';
-import {createAppTheme} from './theme';
+import { AppLoading } from './components/AppLoading';
+import { ColorModeProvider, useColorMode } from './contexts/ColorModeContext';
+import { API_CONFIG } from './core/config/api';
+import { AUTH_CONFIG } from './core/config/auth';
+import { AuthProvider } from './core/contexts/auth/AuthProvider';
+import { LocationChangeGuardProvider } from './core/contexts/location/LocationChangeGuardContext';
+import { LocationProvider } from './core/contexts/location/LocationProvider';
+import { QueryProvider } from './core/queries/QueryProvider';
+import { createAppTheme } from './theme';
 import './i18n';
 
 const logtoConfig: LogtoConfig = {
@@ -52,7 +52,7 @@ export const meta: MetaFunction = () => [
 ];
 
 export const links: LinksFunction = () => [
-  {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
     href: 'https://fonts.gstatic.com',
@@ -64,15 +64,13 @@ export const links: LinksFunction = () => [
   },
 ];
 
-function ThemedApp({children}: {children: React.ReactNode}) {
-  const {mode} = useColorMode();
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+function ThemedApp({ children }: { children: React.ReactNode }) {
+  const { resolvedMode } = useColorMode();
+  const theme = useMemo(() => createAppTheme(resolvedMode), [resolvedMode]);
 
-  // Set color-scheme on <html> so native browser elements (scrollbars, form controls)
-  // respect the current theme mode
   useEffect(() => {
-    document.documentElement.style.colorScheme = mode;
-  }, [mode]);
+    document.documentElement.style.colorScheme = resolvedMode;
+  }, [resolvedMode]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -82,8 +80,8 @@ function ThemedApp({children}: {children: React.ReactNode}) {
   );
 }
 
-export function Layout({children}: {children: React.ReactNode}) {
-  const {t, i18n} = useTranslation();
+export function Layout({ children }: { children: React.ReactNode }) {
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     document.title = t('appName');
@@ -150,11 +148,11 @@ export function ErrorBoundary() {
           textAlign: 'center',
         }}
       >
-        <ErrorOutlineIcon sx={{fontSize: 64, color: 'error.main', mb: 2}} />
+        <ErrorOutlineIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
         <Typography variant="h5" gutterBottom>
           {title}
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{mb: 3, maxWidth: 480}}>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 480 }}>
           {detail}
         </Typography>
         <Button variant="contained" onClick={() => window.location.reload()}>
